@@ -30,8 +30,8 @@ router.get('/:id', async (request, response) => {
 // Add a new book
 router.post('/', authMiddleware, async (request, response) => {
     try {
-        const user=await User.findById(request.user.userId);
-        if(user.userType=='Student'){
+        const user = await User.findById(request.user.userId);
+        if (user.userType == 'Student') {
             return response.status(404).json({ message: "You are not authorized user to access this api" });
         }
         const book = new Book(request.body);
@@ -43,7 +43,7 @@ router.post('/', authMiddleware, async (request, response) => {
 });
 
 // Update a book by ID
-router.put('/:id', async (request, response) => {
+router.put('/:id', authMiddleware, async (request, response) => {
     try {
         const book = await Book.findByIdAndUpdate(request.params.id, request.body, { new: true });
         if (!book) {
@@ -56,7 +56,7 @@ router.put('/:id', async (request, response) => {
 });
 
 // Delete a book by ID
-router.delete('/:id', async (request, response) => {
+router.delete('/:id', authMiddleware, async (request, response) => {
     try {
         const book = await Book.findByIdAndDelete(request.params.id);
         if (!book) {
