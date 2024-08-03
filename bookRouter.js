@@ -1,6 +1,7 @@
 const express = require('express');
 const Book = require('./models/Book');
-
+const User = require('./models/User');
+const authMiddleware = require('./middlewares/authMiddleware');
 const router = express.Router();
 
 // Get all books
@@ -27,8 +28,12 @@ router.get('/:id', async (request, response) => {
 });
 
 // Add a new book
-router.post('/', async (request, response) => {
+router.post('/', authMiddleware, async (request, response) => {
     try {
+        const user=await User.findById(request.user.userId);
+        if(user.userType=='Student'){
+            return response.status(404).json({ message: "You are not authorized user to access this api" });
+        }
         const book = new Book(request.body);
         await book.save();
         response.status(201).json(book);
